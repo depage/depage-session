@@ -70,7 +70,7 @@ class SessionHandler implements \SessionHandlerInterface
      * @param string $name
      * @return bool
      **/
-    public function open(string $save_path, string $name): bool
+    public function open($save_path, $name):bool
     {
         return true;
     }
@@ -81,7 +81,7 @@ class SessionHandler implements \SessionHandlerInterface
      *
      * @return bool
      **/
-    public function close(): bool
+    public function close():bool
     {
         if ($this->lockWaitTime > 0) {
             // release session lock
@@ -98,7 +98,7 @@ class SessionHandler implements \SessionHandlerInterface
      * @param string $sessionId
      * @return string
      **/
-    public function read($sessionId): string|false
+    public function read($sessionId):string|false
     {
         if ($this->lockWaitTime > 0) {
             // aquire session lock
@@ -126,7 +126,7 @@ class SessionHandler implements \SessionHandlerInterface
         $result = $query->fetchObject();
 
         if ($result) {
-            $this->sessionData = $result->sessionData;
+            $this->sessionData = $result->sessionData ?? "";
             $this->seqno = $result->seqno;
 
             return $this->sessionData;
@@ -143,7 +143,7 @@ class SessionHandler implements \SessionHandlerInterface
      * @param string $sessionData
      * @return bool
      **/
-    public function write(string $sessionId, string $sessionData): bool
+    public function write($sessionId, $sessionData):bool
     {
         // only update timestamp when session data has not changed
         if ($this->sessionData === $sessionData) {
@@ -200,7 +200,7 @@ class SessionHandler implements \SessionHandlerInterface
      * @param string $sessionId
      * @return bool
      **/
-    public function destroy(string $sessionId): bool
+    public function destroy($sessionId):bool
     {
         // logout user -> load user first
         if (class_exists("\\Depage\\Auth\\User")) {
@@ -238,7 +238,7 @@ class SessionHandler implements \SessionHandlerInterface
      * @param mixed $maxlifetime
      * @return true
      **/
-    public function gc(int $maxlifetime): int|false
+    public function gc($maxlifetime):int|false
     {
         $count = 0;
 
@@ -269,11 +269,9 @@ class SessionHandler implements \SessionHandlerInterface
                 userid IS NULL AND
                 dateLastUpdate < DATE_SUB(NOW(), INTERVAL $maxlifetime SECOND)"
         );
-        $count += $result->rowCount();
 
         return $count;
     }
     // }}}
 }
-
 /* vim:set ft=php sw=4 sts=4 fdm=marker : */
